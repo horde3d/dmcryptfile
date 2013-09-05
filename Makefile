@@ -1,3 +1,8 @@
+prefix ?= /usr
+bindir ?= $(prefix)/bin
+
+DESTDIR ?= 
+
 TARGET = dmcryptfile
 LIBS = -lm
 CC = gcc
@@ -18,6 +23,10 @@ HEADERS = $(wildcard *.h)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+
+install: $(TARGET)
+	install -d $(DESTDIR)$(bindir)
+	install -m 0755 $^ $(DESTDIR)$(bindir)
 
 clean:
 	-rm -f *.o
