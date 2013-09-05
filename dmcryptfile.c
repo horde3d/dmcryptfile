@@ -214,7 +214,7 @@ int main(int argc, char * const argv[]) {
             perror("Unable to open input file");
             error = 1;
         }
-        out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR);
+        out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
         if (out_fd < 0) {
             perror("Unable to create output file");
             error = 1;
