@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 *****************************************************************************/
+#define _LARGEFILE64_SOURCE
 
 #include <stdio.h>     /* for printf */
 #include <stdlib.h>    /* for exit */
@@ -300,14 +301,14 @@ int main(int argc, char * const argv[]) {
             fprintf(stderr, "Invalid input file size, should be multiple of %d bytes, output file truncated!\n", SECTOR_SIZE);
 			if (in_fd == out_fd) {
 				off64_t pos = lseek64(in_fd, 0, SEEK_CUR);
-				ftruncate(in_fd, pos);
+				ftruncate(in_fd, pos - r);
 			}
         }
 
         if (!error) {
             printf("Done.\n");
             if (action == ACTION_ENCRYPT) {
-               printf("To use produced image with cryptosetup, under super user issue:\n");
+               printf("To use produced image with cryptsetup, under super user issue:\n");
                printf("cryptsetup open %s <name> --type plain --cipher %s-%s-%s --key-size=%d --key-file=%s\n", outfile, ciphername, chainmode, ivmode, keysize*8, keyfile);
             }
         }
@@ -338,6 +339,3 @@ int main(int argc, char * const argv[]) {
 
     return error;
 }
-
-
-
