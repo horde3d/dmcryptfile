@@ -209,21 +209,26 @@ int main(int argc, char * const argv[]) {
     }
 
     if (!error) {
-	if (strcmp((const char*)&infile, (const char*)&outfile) != 0) {
-	        in_fd = open((const char*)&infile, O_RDONLY);
-        	if (in_fd < 0) {
-	            perror("Unable to open input file");
-        	    error = 1;
-	        }
-        	out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
-	        if (out_fd < 0) {
-	            perror("Unable to create output file");
-        	    error = 1;
-	        }
-	}
-	else {
-		out_fd = in_fd;
-	}
+		if (strcmp((const char*)&infile, (const char*)&outfile) != 0) {
+				in_fd = open((const char*)&infile, O_RDONLY);
+				if (in_fd < 0) {
+					perror("Unable to open input file");
+					error = 1;
+				}
+				out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
+				if (out_fd < 0) {
+					perror("Unable to create output file");
+					error = 1;
+				}
+		}
+		else {
+			in_fd = open((const char*)&infile, O_RDWR);
+			if (in_fd < 0) {
+				perror("Unable to open input file");
+				error = 1;
+			}
+			out_fd = in_fd;
+		}
     }
 
     if (!error) {
@@ -244,6 +249,23 @@ int main(int argc, char * const argv[]) {
         printf("Processing...\n");
         while ((r = read(in_fd, (char*)&sector, SECTOR_SIZE)) == SECTOR_SIZE) {
             *(unsigned int *)iv = scnt & 0xffffffff;
+			// Same file for output
+			if (in_fd == out_fd) {
+				off64_t pos = lseek64(in_fd, 0, SEEK_CUR);
+				if (pos != (off64_t)(-1)) {
+					pos = lseek64(in_fd, pos - SECTOR_SIZE, SEEK_SET);
+					if (pos == (off64_t)(-1)) {
+                        perror("Seek error");
+                        error = 4;
+                        break;
+					}
+				}
+				else {
+                        perror("Seek error");
+                        error = 4;
+                        break;
+				}
+			}
             if (action == ACTION_ENCRYPT) {
                 if (crypt_cipher_encrypt(cipher, (char*)&sector, (char*)&out_sector, SECTOR_SIZE, (char*)&iv, sizeof(iv)) == 0) {
                     if (write(out_fd, (char*)&out_sector, SECTOR_SIZE) != SECTOR_SIZE) {
@@ -276,6 +298,10 @@ int main(int argc, char * const argv[]) {
         }
         if ((r > 0) && (r != SECTOR_SIZE)) {
             fprintf(stderr, "Invalid input file size, should be multiple of %d bytes, output file truncated!\n", SECTOR_SIZE);
+			if (in_fd == out_fd) {
+				off64_t pos = lseek64(in_fd, 0, SEEK_CUR);
+				ftruncate(in_fd, pos);
+			}
         }
 
         if (!error) {
@@ -290,11 +316,17 @@ int main(int argc, char * const argv[]) {
         fprintf(stderr, "Invalid arguments specified, see --help\n");
     }
 
-    if (in_fd >= 0)
-        close(in_fd);
+	if (in_fd != out_fd) {
+		if (in_fd >= 0)
+			close(in_fd);
 
-    if (out_fd >= 0)
-        close(out_fd);
+		if (out_fd >= 0)
+			close(out_fd);
+	}
+	else {
+		if (in_fd >= 0)
+			close(in_fd);
+	}
 
     if (cipher) {
         crypt_cipher_destroy(cipher);
