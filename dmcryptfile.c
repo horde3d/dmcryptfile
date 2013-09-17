@@ -209,16 +209,21 @@ int main(int argc, char * const argv[]) {
     }
 
     if (!error) {
-        in_fd = open((const char*)&infile, O_RDONLY);
-        if (in_fd < 0) {
-            perror("Unable to open input file");
-            error = 1;
-        }
-        out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
-        if (out_fd < 0) {
-            perror("Unable to create output file");
-            error = 1;
-        }
+	if (strcmp((const char*)&infile, (const char*)&outfile) != 0) {
+	        in_fd = open((const char*)&infile, O_RDONLY);
+        	if (in_fd < 0) {
+	            perror("Unable to open input file");
+        	    error = 1;
+	        }
+        	out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC| O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
+	        if (out_fd < 0) {
+	            perror("Unable to create output file");
+        	    error = 1;
+	        }
+	}
+	else {
+		out_fd = in_fd;
+	}
     }
 
     if (!error) {
