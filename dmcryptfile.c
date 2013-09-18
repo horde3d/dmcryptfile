@@ -69,7 +69,7 @@ static struct option long_options[] =
 {
     {"cipher",    required_argument, 0, 'c'},
     {"key-size",    required_argument, 0, 's'},
-    {"key-file",    required_argument, 0, 'k'},
+    {"key-file",    required_argument, 0, 'f'},
     {"in-file",    required_argument, 0, 'i'},
     {"out-file",    required_argument, 0, 'o'},
     {"enc", no_argument, 0, 'e'},
@@ -98,7 +98,7 @@ void display_usage(char* name) {
     printf("Mandatory arguments:\n");
     printf(" --cipher,-c   Cipher-chainmode-ivmode, for example, aes-xts-plain\n");
     printf(" --key-size,-s Size of key in bytes\n");
-    printf(" --key-file,-k Input key file, should be at least key-size bytes.\n");
+    printf(" --key-file,-f Input key file, should be at least key-size bytes.\n");
     printf("               Key data after key-size is ignored.\n");
     printf(" --in-file,-i  Input file\n");
     printf(" --out-file,-o Output file\n");
@@ -152,7 +152,7 @@ int main(int argc, char * const argv[]) {
                     snprintf((char*)&outfile, FILENAME_LEN, "%s", optarg);
                 }
                 break;
-            case 'k':
+            case 'f':
                 if (optarg) {
                     snprintf((char*)&keyfile, FILENAME_LEN, "%s", optarg);
                 }
