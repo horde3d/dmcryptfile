@@ -2,11 +2,11 @@ prefix ?= /usr
 bindir ?= $(prefix)/bin
 
 DESTDIR ?= 
+CC ?= gcc
 
 TARGET = dmcryptfile
 LIBS = -lm
-CC = gcc
-CFLAGS = -g -Wall
+EXTRA_CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
@@ -17,7 +17,7 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
 
 %.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(EXTRA_CFLAGS) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
