@@ -22,7 +22,7 @@ HEADERS = $(wildcard *.h)
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(OBJECTS) -Wall $(LIBS) $(EXTRA_LDFLAGS) $(LDFLAGS) -o $@
 
 install: $(TARGET)
 	install -d $(DESTDIR)$(bindir)
