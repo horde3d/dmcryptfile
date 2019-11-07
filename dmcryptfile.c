@@ -300,7 +300,7 @@ int main(int argc, char * const argv[]) {
                 }
             }
 
-            for (size_t offset = 0; offset < (size_t)bytes_read; offset += SECTOR_SIZE)
+            for (size_t offset = 0; offset < (size_t)bytes_read; scnt++, offset += SECTOR_SIZE)
             {
                 *(unsigned int *)iv = scnt & 0xffffffff;
 
@@ -322,8 +322,6 @@ int main(int argc, char * const argv[]) {
                         break;
                     }
                 }
-                scnt++;
-                offset += SECTOR_SIZE;
             }
             if (write(out_fd, write_buffer, bytes_read) != bytes_read) {
                 perror("Write error");
