@@ -275,7 +275,7 @@ int main(int argc, char * const argv[]) {
         int bytes_read = 0;
         size_t scnt = 0;
         printf("Processing...\n");
-        while (!error && (bytes_read = read(in_fd, (char*)&read_buffer, BUFFER_SIZE)) > 0) {
+        while (!error && (bytes_read = read(in_fd, read_buffer, BUFFER_SIZE)) > 0) {
             if (bytes_read % SECTOR_SIZE != 0)
             {
                 perror("Read size is not multiple of sector size");
@@ -322,14 +322,13 @@ int main(int argc, char * const argv[]) {
                         break;
                     }
                 }
-                if (write(out_fd, (char*)&write_buffer, bytes_read) != bytes_read) {
-                    perror("Write error");
-                    error = 2;
-                    break;
-                }
-
                 scnt++;
                 offset += SECTOR_SIZE;
+            }
+            if (write(out_fd, write_buffer, bytes_read) != bytes_read) {
+                perror("Write error");
+                error = 2;
+                break;
             }
         }
 
