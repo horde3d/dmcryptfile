@@ -124,7 +124,7 @@ char* load_key(const char* keyfile, int keysize)
             key = NULL;
         }
         else {
-            printf("Key loaded from %s, %d bits\n", (char*)&keyfile, keysize*8);
+            printf("Key loaded from %s, %d bits\n", keyfile, keysize*8);
         }
         close(key_fd);
     }
@@ -237,20 +237,20 @@ int main(int argc, char * const argv[]) {
         return 1;
     }
 
-    if (strcmp((const char*)&infile, (const char*)&outfile) != 0) {
-        in_fd = open((const char*)&infile, O_RDONLY);
+    if (strcmp(infile, outfile) != 0) {
+        in_fd = open(infile, O_RDONLY);
         if (in_fd < 0) {
             perror("Unable to open input file");
             error = 1;
         }
-        out_fd = open((const char*)&outfile, O_CREAT | O_TRUNC | O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
+        out_fd = open(outfile, O_CREAT | O_TRUNC | O_RDWR, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP));
         if (out_fd < 0) {
             perror("Unable to create output file");
             error = 1;
         }
     }
     else {
-        in_fd = open((const char*)&infile, O_RDWR);
+        in_fd = open(infile, O_RDWR);
         if (in_fd < 0) {
             perror("Unable to open input file");
             error = 1;
@@ -259,7 +259,7 @@ int main(int argc, char * const argv[]) {
     }
 
     if (!error) {
-        int r = crypt_cipher_init(&cipher, (char*)&ciphername, (char*)&chainmode, key, keysize);
+        int r = crypt_cipher_init(&cipher, ciphername, chainmode, key, keysize);
         if (r != 0) {
             fprintf(stderr, "Failed to init cipher, check /proc/crypto for available ciphers and chain modes\n");
             error = 1;
